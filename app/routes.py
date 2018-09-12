@@ -1,5 +1,5 @@
 from app import app
-from flask import Flask, request, render_template, session
+from flask import Flask, request, render_template, session, redirect, url_for
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -9,10 +9,27 @@ def index():
 			express = request.form.get('expression')
 			expression = str(express)
 
+			ac = expression.count('+')
+			sc = expression.count('-')
+			mc = expression.count('*')
+			dc = expression.count('/')
+
 			#check if the expression is valid
-			if(expression.count('-') == 1 and expression.count('+') < 1 and expression.count('*') < 1 and expression.count('/') < 1):
-				pos = expression.find("-")
-				
+			if(sc == 1 and ac < 1 and mc < 1 and dc < 1):
+				pos = expression.find('-')
+				left, right = expression[:pos], expression[pos+1:]
+
+				#check if the two operand are valid
+				isNumb = left.isdigit() and right.isdigit()
+
+    			#redirect to the subtract endpoint	
+    			if(isNumb):
+    				session['left'] = left
+    				session['right'] = right
+    				return redirect(url_for('subtract'))
+
+			if (ac == 1 and sc < 1 and mc < 1 and dc < 1):
+				pos = expression.find("+")
 				left, right = expression[:pos], expression[pos+1:]
 				
 				#check if the two operand are valid
@@ -20,90 +37,60 @@ def index():
 
     			#redirect to the add endpoint	
     			if(isNumb):
-    				session['my_var'] = left
-    				session['right'] = right
-    				return redirect(url_for('add'))
-    				
-    			return "Invalid expression!!"
-
-""" current point of debug
-
-			elif(expression.count('+') == 1 and expression.count('-') < 1 and expression.count('*') < 1 and expression.count('/') < 1):
-				pos = expression.find('+')
-				left, right = expression[:pos], expression[pos+1:]
-
-				#check if the two operand are valid
-				isNumb = True
-				try:
-    				float(left)
-    				float(right)
-				except ValueError:
-    				isNumb = False
-
-    			#redirect to the subtract endpoint	
-    			if(isNumb):
     				session['left'] = left
     				session['right'] = right
-    				return redirect('/subtract')
+    				return redirect(url_for('add'))
 
+    		return "ERROR"
+"""
 			elif(expression.count('*') == 1 and expression.count('-') < 1 and expression.count('+') < 1 and expression.count('/') < 1):
 				pos = expression.find('*')
 				left, right = expression[:pos], expression[pos+1:]
 
+			
 				#check if the two operand are valid
-				isNumb = True
-				try:
-    				float(left)
-    				float(right)
-				except ValueError:
-    				isNumb = False
+				isNumb = left.isdigit() and right.isdigit()
 
     			#redirect to the multiply endpoint	
     			if(isNumb):
     				session['left'] = left
     				session['right'] = right
-    				return redirect('/multiply')
+    				return redirect(url_for('multiply'))
 
 			elif(expression.count('/') == 1 and expression.count('-') < 1 and expression.count('*') < 1 and expression.count('+') < 1):
 				pos = expression.find('+')
 				left, right = expression[:pos], expression[pos+1:]
 
 				#check if the two operand are valid
-				isNumb = True
-				try:
-    				float(left)
-    				float(right)
-				except ValueError:
-    				isNumb = False
+				isNumb = left.isdigit() and right.isdigit()
 
     			#redirect to the divide endpoint	
     			if(isNumb):
     				session['left'] = left
     				session['right'] = right
-    				return redirect('/divide')
-			
-			return "BAD EXPRESSION!!!"
-"""
+    				return redirect(url_for('divide'))
+			"""
+			#return "BAD EXPRESSION!!!"
+
 
 @app.route('/add')
 def add():
-	#left = float(session.get('left', none))
-	#right = float(session.get('right', none))
-	#result = left + right
-	#return "Result: %s" % result
-	return "SUCCESS"
+	left = float(session.get('left', None))
+	right = float(session.get('right', None))
+	result = left + right
+	return "Result: %s" % str(result)
 
 @app.route('/subtract')
 def subtract():
-	left = float(session.get('left', none))
-	right = float(session.get('right', none))
+	left = float(session.get('left', None))
+	right = float(session.get('right', None))
 	result = left - right
-	return "Result: %s" % result
+	return "Result: %s" %str(result)
 
 @app.route('/multiply')
 def multiply():
-	left = float(session.get('left', none))
-	right = float(session.get('right', none))
+	left = float(session.get('left', None))
+	right = float(session.get('right', None))
 	result = 0;
 
 	#just incase number gets too big
@@ -117,8 +104,8 @@ def multiply():
 
 @app.route('/divide')
 def divide():
-	left = float(session.get('left', none))
-	right = float(session.get('right', none))
+	left = float(session.get('left', None))
+	right = float(session.get('right', None))
 	result = 0;
 
 	#just incase divide by 0
