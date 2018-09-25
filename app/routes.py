@@ -56,7 +56,7 @@ def divide():
 
 	#just incase divide by 0
 	try:
-		result = left * right
+		result = left / right
 	except ValueError:
 		return "BAD EXPRESSION!!"
 
