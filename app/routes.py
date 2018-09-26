@@ -42,7 +42,7 @@ def multiply():
 	#just incase number gets too big
 	try:
 		result = left * right
-	except ValueError:
+	except OverflowError:
 		return "BAD EXPRESSION!!"
 
 	return "Result: %s" % result
@@ -57,7 +57,7 @@ def divide():
 	#just incase divide by 0
 	try:
 		result = left / right
-	except ValueError:
+	except ZeroDivisionError:
 		return "BAD EXPRESSION!!"
 
 	return "Result: %s" % result
